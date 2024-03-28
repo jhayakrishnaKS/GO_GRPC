@@ -1,0 +1,22 @@
+syntax="proto3";
+
+package calculator;
+
+option go_package="github.com/jhayakrishnaKS/GO_GRPC/calculator/proto";
+
+import "sum.proto";
+import "primes.proto";
+import "avg.proto";
+import "max.proto";
+import "multiples.proto";
+import "sumOfN.proto";
+
+service calculatorService{
+    rpc Sum(SumRequest) returns (SumResponse);
+    rpc Primes(PrimeRequest) returns (stream PrimeResponse);
+    rpc Avg(stream AvgRequest) returns (AvgResponse);
+    rpc Max(stream MaxRequest) returns (stream MaxResponse);
+
+    rpc Multiples(MultipleRequest) returns (stream MultipleResponse);
+    rpc sumOfN(stream sumOfNRequest) returns (sumOfNResponse);
+}

@@ -1,0 +1,15 @@
+syntax="proto3";
+
+package greet;
+
+option go_package="github.com/jhayakrishnaKS/GO_GRPC/greet/proto";
+
+
+message MulRequest{
+    int32 first_number=1;
+    int32 second_number=2;
+}
+
+message MulResponse{
+    int32 result=1;
+}

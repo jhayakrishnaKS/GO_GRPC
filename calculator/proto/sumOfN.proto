@@ -1,0 +1,13 @@
+syntax="proto3";
+
+package calculator;
+
+option go_package="github.com/jhayakrishnaKS/GO_GRPC/calculator/proto";
+
+message sumOfNRequest{
+    int32 first_number=1;
+}
+
+message sumOfNResponse{
+    int32 result=1;
+}
