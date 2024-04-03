@@ -1,0 +1,29 @@
+syntax="proto3";
+
+package office;
+
+option go_package="github.com/jhayakrishnaKS/GO_GRPC/office/proto";
+
+import "google/protobuf/empty.proto";
+
+
+message office{
+    string id=1;
+    string emp_id=2;
+    string emp_name=3;
+    string emp_age=4;
+}
+
+message emp_id{
+    string id=1;
+}
+
+service officeService{
+    rpc CreateEmp(office) returns(emp_id);
+    rpc ReadEmp(emp_id) returns(office);
+    rpc UpdateEmp(office) returns(google.protobuf.Empty);
+    rpc ListEmp(google.protobuf.Empty) returns(stream office);
+    rpc DeleteEmp(emp_id) returns(google.protobuf.Empty);
+
+
+}

@@ -25,6 +25,8 @@ func main() {
 	// doAvg(c)
 	// doMax(c)
 	// doMultiple(c)
-	doSumOfN(c)
+	// doSumOfN(c)
+	// doEven(c)
+	doSqrt(c,-10)
 
 }

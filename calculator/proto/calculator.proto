@@ -10,6 +10,8 @@ import "avg.proto";
 import "max.proto";
 import "multiples.proto";
 import "sumOfN.proto";
+import "even.proto";
+import "sqrt.proto";
 
 service calculatorService{
     rpc Sum(SumRequest) returns (SumResponse);
@@ -19,4 +21,6 @@ service calculatorService{
 
     rpc Multiples(MultipleRequest) returns (stream MultipleResponse);
     rpc sumOfN(stream sumOfNRequest) returns (sumOfNResponse);
+    rpc Even(stream EvenRequest) returns (stream EvenResponse);
+    rpc Sqrt(SqrtRequest) returns (SqrtResponse);
 }

@@ -28,6 +28,8 @@ type CalculatorServiceClient interface {
 	Max(ctx context.Context, opts ...grpc.CallOption) (CalculatorService_MaxClient, error)
 	Multiples(ctx context.Context, in *MultipleRequest, opts ...grpc.CallOption) (CalculatorService_MultiplesClient, error)
 	SumOfN(ctx context.Context, opts ...grpc.CallOption) (CalculatorService_SumOfNClient, error)
+	Even(ctx context.Context, opts ...grpc.CallOption) (CalculatorService_EvenClient, error)
+	Sqrt(ctx context.Context, in *SqrtRequest, opts ...grpc.CallOption) (*SqrtResponse, error)
 }
 
 type calculatorServiceClient struct {
@@ -210,6 +212,46 @@ func (x *calculatorServiceSumOfNClient) CloseAndRecv() (*SumOfNResponse, error) 
 	return m, nil
 }
 
+func (c *calculatorServiceClient) Even(ctx context.Context, opts ...grpc.CallOption) (CalculatorService_EvenClient, error) {
+	stream, err := c.cc.NewStream(ctx, &CalculatorService_ServiceDesc.Streams[5], "/calculator.calculatorService/Even", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &calculatorServiceEvenClient{stream}
+	return x, nil
+}
+
+type CalculatorService_EvenClient interface {
+	Send(*EvenRequest) error
+	Recv() (*EvenResponse, error)
+	grpc.ClientStream
+}
+
+type calculatorServiceEvenClient struct {
+	grpc.ClientStream
+}
+
+func (x *calculatorServiceEvenClient) Send(m *EvenRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *calculatorServiceEvenClient) Recv() (*EvenResponse, error) {
+	m := new(EvenResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *calculatorServiceClient) Sqrt(ctx context.Context, in *SqrtRequest, opts ...grpc.CallOption) (*SqrtResponse, error) {
+	out := new(SqrtResponse)
+	err := c.cc.Invoke(ctx, "/calculator.calculatorService/Sqrt", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CalculatorServiceServer is the server API for CalculatorService service.
 // All implementations must embed UnimplementedCalculatorServiceServer
 // for forward compatibility
@@ -220,6 +262,8 @@ type CalculatorServiceServer interface {
 	Max(CalculatorService_MaxServer) error
 	Multiples(*MultipleRequest, CalculatorService_MultiplesServer) error
 	SumOfN(CalculatorService_SumOfNServer) error
+	Even(CalculatorService_EvenServer) error
+	Sqrt(context.Context, *SqrtRequest) (*SqrtResponse, error)
 	mustEmbedUnimplementedCalculatorServiceServer()
 }
 
@@ -244,6 +288,12 @@ func (UnimplementedCalculatorServiceServer) Multiples(*MultipleRequest, Calculat
 }
 func (UnimplementedCalculatorServiceServer) SumOfN(CalculatorService_SumOfNServer) error {
 	return status.Errorf(codes.Unimplemented, "method SumOfN not implemented")
+}
+func (UnimplementedCalculatorServiceServer) Even(CalculatorService_EvenServer) error {
+	return status.Errorf(codes.Unimplemented, "method Even not implemented")
+}
+func (UnimplementedCalculatorServiceServer) Sqrt(context.Context, *SqrtRequest) (*SqrtResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Sqrt not implemented")
 }
 func (UnimplementedCalculatorServiceServer) mustEmbedUnimplementedCalculatorServiceServer() {}
 
@@ -396,6 +446,50 @@ func (x *calculatorServiceSumOfNServer) Recv() (*SumOfNRequest, error) {
 	return m, nil
 }
 
+func _CalculatorService_Even_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(CalculatorServiceServer).Even(&calculatorServiceEvenServer{stream})
+}
+
+type CalculatorService_EvenServer interface {
+	Send(*EvenResponse) error
+	Recv() (*EvenRequest, error)
+	grpc.ServerStream
+}
+
+type calculatorServiceEvenServer struct {
+	grpc.ServerStream
+}
+
+func (x *calculatorServiceEvenServer) Send(m *EvenResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *calculatorServiceEvenServer) Recv() (*EvenRequest, error) {
+	m := new(EvenRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _CalculatorService_Sqrt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SqrtRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CalculatorServiceServer).Sqrt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/calculator.calculatorService/Sqrt",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CalculatorServiceServer).Sqrt(ctx, req.(*SqrtRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CalculatorService_ServiceDesc is the grpc.ServiceDesc for CalculatorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -406,6 +500,10 @@ var CalculatorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Sum",
 			Handler:    _CalculatorService_Sum_Handler,
+		},
+		{
+			MethodName: "Sqrt",
+			Handler:    _CalculatorService_Sqrt_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
@@ -433,6 +531,12 @@ var CalculatorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "sumOfN",
 			Handler:       _CalculatorService_SumOfN_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "Even",
+			Handler:       _CalculatorService_Even_Handler,
+			ServerStreams: true,
 			ClientStreams: true,
 		},
 	},
